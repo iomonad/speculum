@@ -1,14 +1,31 @@
-# speculum
+# Speculum
+> Mirror XYZ Raster Tiles locally, rebuild the server arborescence and estimate total mirror coverage
 
-A Clojure library designed to ... well, that part is up to you.
+## Rationale
 
-## Usage
+The goal of Speculum is to provide kind of disk backed Tiles & WMS cache that work 
+transparently like a proxy on your data provider. The cache is populated incrementally 
+depending client requests and are served from disk in priority.
 
-FIXME
+This enable you to partially mirror data from your provider, and reduce requests on it,
+acting like a local proxy.
+
+## Building
+
+```bash
+lein uberjar
+```
+
+## Disclaimer
+
+This project can be subjected to Copyright infringement. After using the application, 
+be sure to don't violate creator’s exclusive rights to the work without permission.
+
+Speculum is an experimental project, use at you own risk.
 
 ## License
 
-Copyright © 2022 FIXME
+Copyright © 2022 iomonad <iomonad@riseup.net>
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
