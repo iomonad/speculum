@@ -5,8 +5,11 @@
             [reitit.pedestal :as pedestal]
             [reitit.http :as http]
             [speculum.routes :refer [routes]]
+            [reitit.http.coercion :as coercion]
             [muuntaja.core :as muuntaja]
+            [reitit.coercion.schema]
             [reitit.http.interceptors
+             [exception :as exception]
              [parameters :as ri.parameters]
              [muuntaja   :as ri.muuntaja]]))
 
@@ -16,8 +19,12 @@
 
 (def interceptors-stack
   [(ri.parameters/parameters-interceptor)
-   (ri.muuntaja/format-interceptor)
-   (ri.muuntaja/format-response-interceptor)])
+   (ri.muuntaja/format-negotiate-interceptor)
+   (ri.muuntaja/format-response-interceptor)
+   (exception/exception-interceptor)
+   (ri.muuntaja/format-request-interceptor)
+   (coercion/coerce-response-interceptor)
+   (coercion/coerce-request-interceptor)])
 
 (defmethod ig/init-key :component/webserver
   [_ {:keys [port] :as system}]
@@ -27,18 +34,14 @@
                       ;; no pedestal routes
                       ::server/routes []}
         deps (select-keys system [:config])
-        muuntaja-formatter (muuntaja/create
-                              (assoc-in
-                               muuntaja/default-options
-                               [:formats "application/json" :encoder-opts]
-                               {:date-format "yyyy-MM-dd'T'HH:mm:ss.SSSX"}))
         instance (-> default-conf
                      (server/default-interceptors)
                      (pedestal/replace-last-interceptor
                       (pedestal/routing-interceptor
                        (http/router [(routes deps)]
                                     (cond-> {:resources deps
-                                             :data {:muuntaja muuntaja-formatter
+                                             :data {:muuntaja muuntaja/instance
+                                                    :coercion reitit.coercion.schema/coercion
                                                     :interceptor interceptors-stack}}))))
                      (server/dev-interceptors)
                      (server/create-server)

@@ -1,1 +1,2 @@
-(ns user)
+(ns user
+  (:require [clojure.tools.namespace.repl :refer [refresh]]))
