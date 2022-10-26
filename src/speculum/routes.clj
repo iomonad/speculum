@@ -10,7 +10,7 @@
 
 (defn routes [ressources]
   [["/" {:name ::root
-         :get {:handler (fn [_ctx]
+         :get {:handler (fn [_]
                           (-> (r/resource-response "index.html"
                                                    {:root "public"})
                               (r/content-type "text/html")))}}]
@@ -26,4 +26,5 @@
                                :service s/Str
                                :x s/Int
                                :y s/Int
-                               :z s/Int}}}}]])
+                               :z s/Int}
+                        :query {:preview? s/Bool}}}}]])
