@@ -1,6 +1,7 @@
 (ns speculum.routes
   (:require [speculum.controllers.ping :as ping]
             [speculum.controllers.tiles :as tiles]
+            [ring.util.response :as r]
             [schema.core :as s]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -8,7 +9,12 @@
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (defn routes [ressources]
-  [["/ping" {:name ::ping
+  [["/" {:name ::root
+         :get {:handler (fn [_ctx]
+                          (-> (r/resource-response "index.html"
+                                                   {:root "public"})
+                              (r/content-type "text/html")))}}]
+   ["/ping" {:name ::ping
              :get {:handler (ping/ping-handler
                              {:app-name "speculum"}
                              ressources)}}]

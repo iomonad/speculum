@@ -3,6 +3,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css"
 	  integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
 	  crossorigin=""/>
+    <link rel="icon" href="https://trosa.io/img/favicon.ico" />
+    <title>Speculum Reports</title>
     <style>
       body {
           padding: 0;
@@ -29,8 +31,9 @@
 	  maxZoom: 19,
       }).addTo(map);
 
-      L.tileLayer('http://localhost:3000/tiles/fixme/fixme/{z}/{x}/{y}.png', {
+      L.tileLayer('/tiles/fixme/fixme/{z}/{x}/{y}.png', {
 	  maxZoom: 19,
+	  opacity: 20
       }).addTo(map);
 
     </script>

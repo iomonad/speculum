@@ -1,10 +1,11 @@
 (ns speculum.core
   (:require [integrant.core :as ig]
             [omniconf.core :as cfg]
-            [speculum.components.webserver]
-            [speculum.components.logging]
-            [clojure.tools.logging :as log]
-            [unilog.config :as ul])
+            [speculum.components
+             [config]
+             [webserver]
+             [logging]]
+            [clojure.tools.logging :as log])
   (:gen-class))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

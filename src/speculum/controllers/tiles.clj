@@ -9,8 +9,9 @@
 (defn proxify-tiles
   "Proxy Handler"
   [{:keys [path-params uri] :as request}]
-  (log/info "got proxy request" uri)
-  {:status 200
-   :headers {"Content-Type" "image/png"}
-   :body (io/input-stream
-          (io/resource "empty.png"))})
+  (let [{:keys [vendor service x y z ext]} path-params]
+    (log/info "got proxy request" uri)
+    {:status 200
+     :headers {"Content-Type" "image/png"}
+     :body (io/input-stream
+            (io/resource "empty.png"))}))

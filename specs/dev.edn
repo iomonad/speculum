@@ -11,4 +11,10 @@
               "org.apache"     :warn
               "xtdb"           :debug}}
  ;; =================================
- :component/webserver {:port 3000}}
+ :component/webserver {:port 3000}
+ ;; =================================
+ :component/config
+ {:tiles-providers {:osm
+                    {:osm-street
+                     {:url "https://tile.openstreetmap.org/{z}/{x}/{y}.png"}}}
+  :wms-provider {}} }

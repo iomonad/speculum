@@ -32,7 +32,9 @@
                       ::server/port port
                       ::server/join? false
                       ;; no pedestal routes
-                      ::server/routes []}
+                      ::server/routes []
+                      ::server/secure-headers {:content-security-policy-settings
+                                               {:object-src "none"}}}
         deps (select-keys system [:config])
         instance (-> default-conf
                      (server/default-interceptors)
