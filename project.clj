@@ -12,8 +12,10 @@
                                   [io.pedestal/pedestal.service "0.5.5"]
                                   [metosin/reitit               "0.5.18"]
                                   [metosin/reitit-pedestal      "0.5.18"]
+                                  [metosin/muuntaja             "0.6.8"]
                                   [org.clojure/tools.logging    "1.2.4"]
-                                  [org.clojure/tools.namespace  "1.3.0"]]
+                                  [org.clojure/tools.namespace  "1.3.0"]
+                                  [spootnik/unilog              "0.7.31"]]
                    :source-paths ["dev"]
                    :resource-paths ["resources"]}
              :uberjar {:aot :all}}

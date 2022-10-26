@@ -1,15 +1,14 @@
-(ns speculum.routes)
+(ns speculum.routes
+  (:require [speculum.controllers.ping :as ping]
+            [speculum.controllers.tiles :as tiles]))
 
-(defn interceptor [number]
-  {:enter (fn [ctx] (update-in ctx [:request :number] (fnil + 0) number))})
+;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+;;;  Routes
+;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-(def routes
-  ["/api"
-   {:interceptors [(interceptor 1)]}
-
-   ["/number"
-    {:interceptors [(interceptor 10)]
-     :get {:interceptors [(interceptor 100)]
-           :handler (fn [req]
-                      {:status 200
-                       :body (select-keys req [:number])})}}]])
+(defn routes [ressources]
+  ["/ping" {:name ::ping
+            :resources [:config]
+            :get {:handler (ping/ping-handler
+                            {:app-name "speculum"}
+                            ressources)}}])

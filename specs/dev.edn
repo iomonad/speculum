@@ -1,1 +1,14 @@
-{:component/webserver {:port 3000}}
+{:component/logging
+ {:console {:encoder :pattern
+            :pattern "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %logger{36} - %msg%n"
+            :filters [[:logstash :deny :neutral]]}
+  :level :debug
+  :app-level :debug
+  :app-name "speculum"
+  :overrides {"pedestal-tools" :debug
+              "io.pedestal"    :warn
+              "org.eclipse"    :warn
+              "org.apache"     :warn
+              "xtdb"           :debug}}
+ ;; =================================
+ :component/webserver {:port 3000}}

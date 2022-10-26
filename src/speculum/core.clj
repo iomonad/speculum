@@ -2,15 +2,19 @@
   (:require [integrant.core :as ig]
             [omniconf.core :as cfg]
             [speculum.components.webserver]
-            [clojure.tools.logging :as log])
+            [speculum.components.logging]
+            [clojure.tools.logging :as log]
+            [unilog.config :as ul])
   (:gen-class))
 
+;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+;;;  Core
+;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (cfg/define
   {:spec {:description "application spec"
           :type :file
           :required true}})
-
 
 (defn -main [& args]
   (cfg/populate-from-cmd args)
