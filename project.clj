@@ -15,7 +15,7 @@
                                   [metosin/muuntaja             "0.6.8"]
                                   [org.clojure/tools.logging    "1.2.4"]
                                   [org.clojure/tools.namespace  "1.3.0"]
-                                  [spootnik/unilog              "0.7.31"]
+                                  [spootnik/unilog              "0.7.24"]
                                   [prismatic/schema             "1.4.1"]]
                    :source-paths ["dev"]
                    :resource-paths ["resources"]}
