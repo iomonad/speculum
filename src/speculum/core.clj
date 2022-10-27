@@ -4,7 +4,8 @@
             [speculum.components
              [config]
              [webserver]
-             [logging]]
+             [logging]
+             [storage]]
             [clojure.tools.logging :as log])
   (:gen-class))
 

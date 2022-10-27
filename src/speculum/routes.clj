@@ -2,7 +2,8 @@
   (:require [speculum.controllers.ping :as ping]
             [speculum.controllers.tiles :as tiles]
             [ring.util.response :as r]
-            [schema.core :as s]))
+            [schema.core :as s]
+            [speculum.interceptors :as itcp]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ;;;  Routes
@@ -22,6 +23,7 @@
    ["/tiles/:vendor/:service/:x/:y/{z}.{ext}"
     {:name ::tiles-proxy
      :get {:handler tiles/proxify-tiles
+           :interceptors [(itcp/speculum-context ressources)]
            :parameters {:path {:vendor s/Str
                                :service s/Str
                                :x s/Int

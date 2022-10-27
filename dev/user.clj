@@ -1,10 +1,8 @@
 (ns user
   (:require [clojure.tools.namespace.repl :refer [refresh]]
-            [unilog.config :as u]
             [integrant.repl :as ir]
-            [integrant.core :as ig]))
-
-(u/start-logging! u/default-configuration)
+            [integrant.core :as ig]
+            [clojure.pprint :refer [pprint]]))
 
 (defn repl-spec []
   (ig/read-string (slurp "specs/dev.edn")))
@@ -15,4 +13,6 @@
 (defn- re! [] (halt!) (refresh) (go!))
 (defn system [] integrant.repl.state/system)
 (defn pprint-system []
-  (clojure.pprint/pprint (system)))
+  (pprint (system)))
+
+;;; 

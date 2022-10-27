@@ -11,14 +11,16 @@
             [reitit.http.interceptors
              [exception :as exception]
              [parameters :as ri.parameters]
-             [muuntaja   :as ri.muuntaja]]))
+             [muuntaja   :as ri.muuntaja]]
+            [speculum.interceptors :as itcp]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ;;;  Webserver
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-(def interceptors-stack
-  [(ri.parameters/parameters-interceptor)
+(defn interceptors-stack [components]
+  [(itcp/speculum-context components)
+   (ri.parameters/parameters-interceptor)
    (ri.muuntaja/format-negotiate-interceptor)
    (ri.muuntaja/format-response-interceptor)
    (exception/exception-interceptor)
@@ -35,7 +37,7 @@
                       ::server/routes []
                       ::server/secure-headers {:content-security-policy-settings
                                                {:object-src "none"}}}
-        deps (select-keys system [:config])
+        deps (select-keys system [:config :storage])
         instance (-> default-conf
                      (server/default-interceptors)
                      (pedestal/replace-last-interceptor
@@ -44,7 +46,9 @@
                                     (cond-> {:resources deps
                                              :data {:muuntaja muuntaja/instance
                                                     :coercion reitit.coercion.schema/coercion
-                                                    :interceptor interceptors-stack}}))))
+                                                    ;; Keep stock itcp for the moment
+                                                    #_#_:interceptors (interceptors-stack
+                                                                       deps)}}))))
                      (server/dev-interceptors)
                      (server/create-server)
                      (server/start))]
@@ -53,7 +57,7 @@
 
 
 (defmethod ig/halt-key! :component/webserver
-  [_ {:keys [instance]}]
-  (when instance
+  [_ {:keys [server]}]
+  (when server
     (log/info "shutting down server instance")
-    (server/stop instance)))
+    (server/stop server)))

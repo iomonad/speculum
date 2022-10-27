@@ -9,9 +9,16 @@
               "io.pedestal"    :warn
               "org.eclipse"    :warn
               "org.apache"     :warn
-              "xtdb"           :debug}}
+              "xtdb"           :debug
+              "speculum"       :info}}
  ;; =================================
- :component/webserver {:port 3000}
+ :component/webserver {:logging #ig/ref :component/logging
+                       :storage #ig/ref :component/storage
+                       :config #ig/ref :component/config
+                       :port 3000}
+ ;; =================================
+ :component/storage {:output-directory "mirror"
+                     :auto-create? true}
  ;; =================================
  :component/config
  {:tiles-providers {:osm
