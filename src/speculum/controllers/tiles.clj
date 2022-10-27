@@ -7,25 +7,44 @@
 ;;;  Tiles
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-(defn mk-default [path]
+(defn mk-image [path]
   {:status 200
    :headers {"Content-Type" "image/png"}
    :body (io/input-stream
           (io/resource path))})
 
-(defn default-texture [] (mk-default "empty.png"))
-(defn error-texture [] (mk-default "error.png"))
+(defn mk-storage-image [path]
+  {:status 200
+   :headers {"Content-Type" "image/png"}
+   :body (io/input-stream
+          (io/file path))})
+
+
+(defn default-texture [] (mk-image "empty.png"))
+(defn error-texture [] (mk-image "error.png"))
+
 
 (defn process-mirroring
   [{:keys [config storage path-params]} hash]
-  (let [{:keys [tiles-providers]} config
+  (let [{:keys [tiles-providers pool]} config
+        {:keys [output-directory tile-storage]} storage
         {:keys [vendor service x y z ext]} path-params]
-    (if-let [origin (get-in tiles-providers [vendor service])]
-      (let [target-fragment (format "%s/%d/%d/%d.%s" origin x y z ext)]
-        (log/trace "mirroring" target-fragment)
-        (error-texture))
-      (error-texture))
-    (error-texture)))
+    (if-let [origin (get-in tiles-providers
+                            [(keyword vendor) (keyword service) :url])]
+      (let [path-structure (format "%s/%s/%s.%s" x y z ext)
+            fs-structure (format "%s/%s/%s/%s" output-directory
+                                 vendor service path-structure)
+            target-fragment (str origin path-structure)]
+        ;; request & store tile
+        (if-let [mirrored-path (utils/download-fragment!! pool target-fragment
+                                                          fs-structure)]
+          ;; If successfully mirrored, serve it...
+          (do
+            (swap! tile-storage assoc hash mirrored-path)
+            (mk-storage-image mirrored-path))
+          (error-texture)))
+      (error-texture))))
+
 
 (defn proxify-tiles
   "Proxify & cache the Raster Tile Requests
@@ -35,26 +54,19 @@
           tiles if present in the filesystem, otherwise
           return the default tile
   "
-  [{:keys [path-params query-params uri storage config] :as request}]
-  (let [{:keys [vendor service x y z ext]} path-params
-        {:keys [preview?]} query-params
-        {:keys [tile-storage]} storage]
-    (let [uri-hash (utils/ressource->hashkey uri)]
-      (if preview?
-        (if-let [fragment-path (get @tile-storage uri-hash)]
-          {:status 200
-           :headers {"Content-Type" "image/png"}
-           :body (io/input-stream
-                  (io/resource fragment-path))}
-          ;; Else yield default texture
-          (default-texture))
-        (if-let [fragment-path (get @tile-storage uri-hash)]
-          {:status 200
-           :headers {"Content-Type" "image/png"}
-           :body (io/input-stream
-                  (io/resource fragment-path))}
-          ;; Else fetch, store and return the fragment
-          (try
-            (process-mirroring request uri-hash)
-            (catch Exception e
-              (log/error (.getMessage e)))))))))
+  [{:keys [query-params uri storage] :as request}]
+  (let [{:keys [preview?]} query-params
+        {:keys [tile-storage]} storage
+        uri-hash (utils/ressource->hashkey uri)]
+    (if preview?
+      (if-let [fragment-path (get @tile-storage uri-hash)]
+        (mk-storage-image fragment-path)
+        ;; Else yield default texture
+        (default-texture))
+      (if-let [fragment-path (get @tile-storage uri-hash)]
+        (mk-storage-image fragment-path)
+        ;; Else fetch, store and return the fragment
+        (try
+          (process-mirroring request uri-hash)
+          (catch Exception e
+            (log/error (.getMessage e))))))))

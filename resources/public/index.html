@@ -24,18 +24,35 @@
 	    integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg="
 	    crossorigin=""></script>
 
+    <script src="https://raw.githubusercontent.com/mlevans/leaflet-hash/master/leaflet-hash.js"></script>
+
     <script type="text/javascript">
       var map = L.map('map').setView([48.853, 2.333], 13);
 
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	  maxZoom: 19,
       }).addTo(map);
 
-//      L.tileLayer('/tiles/fixme/fixme/{z}/{x}/{y}.png?preview%3f=true', {
-      L.tileLayer('/tiles/fixme/fixme/{z}/{x}/{y}.png', {
-	  maxZoom: 19,
-	  opacity: 0.5
+      var poll = L.tileLayer('/tiles/igcp/igc-retina-192dpi/{z}/{x}/{y}.png', {
+	  maxZoom: 21,
+	  opacity: 0.5,
+	  tms: true
       }).addTo(map);
+
+      var progress  = L.tileLayer('/tiles/igcp/igc-retina-192dpi/{z}/{x}/{y}.png?preview%3f=true', {
+	  maxZoom: 21,
+	  opacity: 0.5,
+	  tms: true
+      });
+
+      var overlays = {
+	  "Poll": poll,
+	  "Progress": progress
+      };
+
+      //var hash = new L.Hash(map);
+      var layerControl = L.control.layers({"OSM": osm}, overlays)
+	  .addTo(map);
 
     </script>
 

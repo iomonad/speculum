@@ -14,5 +14,3 @@
 (defn system [] integrant.repl.state/system)
 (defn pprint-system []
   (pprint (system)))
-
-;;; 
