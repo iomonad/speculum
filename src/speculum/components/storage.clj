@@ -29,6 +29,7 @@
                         {:path output-directory}))))
   (let [tile-storage (atom (rebuild-tiles-structure! output-directory))
         wms-storage  (atom (hash-map))]
+    (log/infof "rebuild tile storage of size %d" (count @tile-storage))
     (log/info "starting storage component")
     (assoc sys
            :tile-storage tile-storage
@@ -37,4 +38,3 @@
 (defmethod ig/halt-key! :component/storage
   [_ {:keys []}]
   (log/info "stopping storage component"))
-
