@@ -5,7 +5,6 @@
             [reitit.pedestal :as pedestal]
             [reitit.http :as http]
             [speculum.routes :refer [routes]]
-            [reitit.http.coercion :as coercion]
             [muuntaja.core :as muuntaja]
             [reitit.coercion.schema]
             [reitit.http.interceptors
@@ -28,30 +27,31 @@
 
 (defmethod ig/init-key :component/webserver
   [_ {:keys [port] :as system}]
-  (let [default-conf {::server/type :jetty
-                      ::server/port port
-                      ::server/join? false
-                      ;; no pedestal routes
-                      ::server/routes []
-                      ::server/secure-headers {:content-security-policy-settings
-                                               {:object-src "none"}}}
-        deps (select-keys system [:config :storage])
-        instance (-> default-conf
-                     (server/default-interceptors)
-                     (pedestal/replace-last-interceptor
-                      (pedestal/routing-interceptor
-                       (http/router [(routes deps)]
-                                    (cond-> {:resources deps
-                                             :data {:muuntaja muuntaja/instance
-                                                    :coercion reitit.coercion.schema/coercion
-                                                    ;; Keep stock itcp for the moment
-                                                    :interceptors (interceptors-stack
-                                                                   deps)}}))))
-                     (server/dev-interceptors)
-                     (server/create-server)
-                     (server/start))]
-    (log/info "starting webserver component")
-    (assoc system :server instance)))
+  (with-redefs [io.pedestal.http.impl.servlet-interceptor/stylobate itcp/stylobate]
+    (let [default-conf {::server/type :jetty
+                        ::server/port port
+                        ::server/join? false
+                        ;; no pedestal routes
+                        ::server/routes []
+                        ::server/secure-headers {:content-security-policy-settings
+                                                 {:object-src "none"}}}
+          deps (select-keys system [:config :storage])
+          instance (-> default-conf
+                       (server/default-interceptors)
+                       (pedestal/replace-last-interceptor
+                        (pedestal/routing-interceptor
+                         (http/router [(routes deps)]
+                                      (cond-> {:resources deps
+                                               :data {:muuntaja muuntaja/instance
+                                                      :coercion reitit.coercion.schema/coercion
+                                                      ;; Keep stock itcp for the moment
+                                                      :interceptors (interceptors-stack
+                                                                     deps)}}))))
+                       (server/dev-interceptors)
+                       (server/create-server)
+                       (server/start))]
+      (log/info "starting webserver component")
+      (assoc system :server instance))))
 
 
 (defmethod ig/halt-key! :component/webserver

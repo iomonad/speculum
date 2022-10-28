@@ -12,4 +12,4 @@ pom.xml.asc
 .hgignore
 .hg/
 specs/prod.edn
-/mirror/
+/mirror*

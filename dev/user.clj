@@ -5,7 +5,7 @@
             [clojure.pprint :refer [pprint]]))
 
 (defn repl-spec []
-  (ig/read-string (slurp "specs/dev.edn")))
+  (ig/read-string (slurp "specs/prod.edn")))
 (defn- prep [] (ir/set-prep! (constantly (repl-spec))))
 (defn- go! []  (prep) (ir/go))
 (defn- refresh! [] (refresh))

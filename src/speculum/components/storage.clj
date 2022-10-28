@@ -20,16 +20,45 @@
                              (str "/tiles" (str/replace path folder "")))
                         path)) {})))
 
+(defn rebuild-wms-structure!
+  [{:keys [wms-providers]} folder]
+  (->> (file-seq (io/file folder))
+       (filter fs/file?)
+       (map #(.toString %))
+       (reduce
+        (fn [acc path]
+          (let [[_ vendor service] (str/split path #"/")
+                implem-url (get-in wms-providers [(keyword vendor)
+                                                  (keyword service)
+                                                  :url])
+                resolved-uri (when implem-url
+                               (str/join "/"
+                                         (rest (-> (str/replace implem-url #"https://" "")
+                                                   (str/split #"/")))))
+                file-bbox (some-> (fs/base-name path)
+                             (str/replace (fs/extension path) ""))]
+            (if resolved-uri
+              (assoc acc (utils/ressource->hashkey
+                          (str "/wms/" resolved-uri ":" file-bbox))
+                     path)
+              acc))) {})))
+
+
 (defmethod ig/init-key :component/storage
-  [_ {:keys [output-directory auto-create?] :as sys}]
-  (when-not (.isDirectory (io/file output-directory))
+  [_ {:keys [output-directory-tiles
+             output-directory-wms auto-create?
+             config] :as sys}]
+  (doseq [outpath [output-directory-tiles output-directory-wms]]
+    (when-not (.isDirectory (io/file outpath))
       (if auto-create?
-        (.mkdir (io/file output-directory))
+        (.mkdir (io/file outpath))
         (throw (ex-info "not a directory or inexistant"
-                        {:path output-directory}))))
-  (let [tile-storage (atom (rebuild-tiles-structure! output-directory))
-        wms-storage  (atom (hash-map))]
-    (log/infof "rebuild tile storage of size %d" (count @tile-storage))
+                        {:path outpath})))))
+  (let [tile-storage (atom (rebuild-tiles-structure! output-directory-tiles))
+        wms-storage  (atom (rebuild-wms-structure! config
+                                                   output-directory-wms))]
+    (log/infof "rebuild tile storage of size %d & wms of %d"
+               (count @tile-storage) (count @wms-storage))
     (log/info "starting storage component")
     (assoc sys
            :tile-storage tile-storage

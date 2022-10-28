@@ -3,7 +3,8 @@
             [speculum.controllers.tiles :as tiles]
             [ring.util.response :as r]
             [schema.core :as s]
-            [speculum.interceptors :as itcp]))
+            [speculum.interceptors :as itcp]
+            [speculum.controllers.wms :as wms]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ;;;  Routes
@@ -28,4 +29,10 @@
                                :x s/Int
                                :y s/Int
                                :z s/Int}
+                        :query {:preview? s/Bool}}}}]
+   ["/wms/:vendor/:service/ows"
+    {:name ::wms-proxy
+     :get {:handler wms/proxify-wms
+           :parameters {:path {:vendor s/Str
+                               :service s/Str}
                         :query {:preview? s/Bool}}}}]])

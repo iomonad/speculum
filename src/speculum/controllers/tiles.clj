@@ -7,32 +7,15 @@
 ;;;  Tiles
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-(defn mk-image [path]
-  {:status 200
-   :headers {"Content-Type" "image/png"}
-   :body (io/input-stream
-          (io/resource path))})
-
-(defn mk-storage-image [path]
-  {:status 200
-   :headers {"Content-Type" "image/png"}
-   :body (io/input-stream
-          (io/file path))})
-
-
-(defn default-texture [] (mk-image "empty.png"))
-(defn error-texture [] (mk-image "error.png"))
-
-
 (defn process-mirroring
   [{:keys [config storage path-params]} hash]
   (let [{:keys [tiles-providers pool]} config
-        {:keys [output-directory tile-storage]} storage
+        {:keys [output-directory-tiles tile-storage]} storage
         {:keys [vendor service x y z ext]} path-params]
     (if-let [origin (get-in tiles-providers
                             [(keyword vendor) (keyword service) :url])]
       (let [path-structure (format "%s/%s/%s.%s" x y z ext)
-            fs-structure (format "%s/%s/%s/%s" output-directory
+            fs-structure (format "%s/%s/%s/%s" output-directory-tiles
                                  vendor service path-structure)
             target-fragment (str origin path-structure)]
         ;; request & store tile
@@ -41,9 +24,9 @@
           ;; If successfully mirrored, serve it...
           (do
             (swap! tile-storage assoc hash mirrored-path)
-            (mk-storage-image mirrored-path))
-          (error-texture)))
-      (error-texture))))
+            (utils/mk-storage-image mirrored-path))
+          (utils/error-texture)))
+      (utils/error-texture))))
 
 
 (defn proxify-tiles
@@ -60,11 +43,11 @@
         uri-hash (utils/ressource->hashkey uri)]
     (if preview?
       (if-let [fragment-path (get @tile-storage uri-hash)]
-        (mk-storage-image fragment-path)
+        (utils/mk-storage-image fragment-path)
         ;; Else yield default texture
-        (default-texture))
+        (utils/default-texture))
       (if-let [fragment-path (get @tile-storage uri-hash)]
-        (mk-storage-image fragment-path)
+        (utils/mk-storage-image fragment-path)
         ;; Else fetch, store and return the fragment
         (try
           (process-mirroring request uri-hash)
