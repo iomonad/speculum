@@ -20,6 +20,13 @@ acting like a local proxy.
 lein uberjar
 ```
 
+## Changelog
+
+### 0.1.0-SNAPSHOT
+
+- Naive ressource hashing and XYZ raster tile mirroring support
+- Basic preview screen with Leaflet to estimage missing parts
+
 ## Disclaimer
 
 This project can be subjected to Copyright infringement. After using the application, 
