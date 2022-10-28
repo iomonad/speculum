@@ -22,7 +22,7 @@ lein uberjar
 
 ## Changelog
 
-### 0.1.0-SNAPSHOT
+### 0.1.0
 
 - Naive ressource hashing and XYZ raster tile mirroring support
 - Basic preview screen with Leaflet to estimage missing parts
