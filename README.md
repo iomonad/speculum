@@ -1,3 +1,7 @@
+<a href="https://github.com/iomonad/gtekportail"><img
+  src=".github/mirror.png" 
+  height="350" align="right"></a>
+  
 # Speculum [![Clojure CI](https://github.com/iomonad/speculum/actions/workflows/clojure.yml/badge.svg)](https://github.com/iomonad/speculum/actions/workflows/clojure.yml)
 > Mirror XYZ Raster Tiles locally, rebuild the server arborescence and estimate total mirror coverage
 
