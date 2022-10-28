@@ -24,9 +24,7 @@
    (ri.muuntaja/format-negotiate-interceptor)
    (ri.muuntaja/format-response-interceptor)
    (exception/exception-interceptor)
-   (ri.muuntaja/format-request-interceptor)
-   (coercion/coerce-response-interceptor)
-   (coercion/coerce-request-interceptor)])
+   (ri.muuntaja/format-request-interceptor)])
 
 (defmethod ig/init-key :component/webserver
   [_ {:keys [port] :as system}]
@@ -47,8 +45,8 @@
                                              :data {:muuntaja muuntaja/instance
                                                     :coercion reitit.coercion.schema/coercion
                                                     ;; Keep stock itcp for the moment
-                                                    #_#_:interceptors (interceptors-stack
-                                                                       deps)}}))))
+                                                    :interceptors (interceptors-stack
+                                                                   deps)}}))))
                      (server/dev-interceptors)
                      (server/create-server)
                      (server/start))]

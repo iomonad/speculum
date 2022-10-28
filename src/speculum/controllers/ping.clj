@@ -21,7 +21,7 @@
                                       :message (.getMessage e)}}))))
                        (into {}))
             ok? (every? (comp :ok val) pings)]
-        (log/info "ping call handled")
+        (log/trace "ping call handled")
         {:status (if ok? 200 599)
          :body
          (merge app-infos
@@ -29,3 +29,4 @@
                  :hostname   (.getHostName (java.net.InetAddress/getLocalHost))
                  :resources  (keys resources)
                  :components pings})}))))
+

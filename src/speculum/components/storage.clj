@@ -33,7 +33,11 @@
     (log/info "starting storage component")
     (assoc sys
            :tile-storage tile-storage
-           :wms-storage wms-storage)))
+           :wms-storage wms-storage
+           :ping-fn (fn []
+                      {:ok true
+                       :indexed-tiles {:xyz (count @tile-storage)
+                                       :wms (count @wms-storage)}}))))
 
 (defmethod ig/halt-key! :component/storage
   [_ {:keys []}]

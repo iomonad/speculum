@@ -23,7 +23,6 @@
    ["/tiles/:vendor/:service/:x/:y/{z}.{ext}"
     {:name ::tiles-proxy
      :get {:handler tiles/proxify-tiles
-           :interceptors [(itcp/speculum-context ressources)]
            :parameters {:path {:vendor s/Str
                                :service s/Str
                                :x s/Int
