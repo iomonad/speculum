@@ -24,6 +24,9 @@ lein uberjar
 
 ### 0.1.1-SNAPSHOT
 
+- WMS Mirroring Support
+- Fix: Avoid return of warn tile on 404 - design choice
+
 ### 0.1.0
 
 - Naive ressource hashing and XYZ raster tile mirroring support

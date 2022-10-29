@@ -43,11 +43,17 @@
              (log/debugf "create tree structure - %s" parent-structure))
            (io/copy body (io/file path))
            ;; Also yield to directly render
-           path)
-         (log/debugf "server returned %s - %s" status target)))
+           {:status :ok
+            :code 200
+            :path path})
+         (do
+           (log/debugf "server returned %s - %s" status target)
+           {:status :warn
+            :code status})))
      (catch Exception e
        (log/errorf "error while mirroring %s - %s"
-                   target e)))))
+                   target e)
+       {:status :failure}))))
 
 
 (defn mk-image [path]

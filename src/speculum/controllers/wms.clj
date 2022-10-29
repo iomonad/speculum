@@ -11,13 +11,22 @@
     (if-let [origin (get-in wms-providers
                             [(keyword vendor) (keyword service) :url])]
       (let [local-path (format "%s/%s/%s/%s/%s.png"
-                               output-directory-wms vendor service layers bbox)]
-        (if-let [mirrored-path (utils/download-fragment!! pool origin
-                                                          local-path query-params)]
+                               output-directory-wms vendor service layers bbox)
+            {:keys [status path code]}
+            (utils/download-fragment!! pool origin
+                                       local-path query-params)]
+        (cond
+          (= :ok status)
+          ;; If successfully mirrored, serve it...
           (do
-            (swap! wms-storage assoc hash mirrored-path)
-            (utils/mk-storage-image mirrored-path))
-          (utils/error-texture)))
+            (swap! wms-storage assoc hash path)
+            (utils/mk-storage-image path))
+
+          (= 404 code)
+          {:status 404
+           :body "Not Found"}
+
+          :else (utils/error-texture)))
       (utils/error-texture))))
 
 

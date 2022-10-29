@@ -1,6 +1,7 @@
 <html>
   <head>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://pasichnykvasyl.github.io/Leaflet.BigImage/src/Leaflet.BigImage.css"/>
     <link rel="icon" href="https://trosa.io/img/favicon.ico" />
     <title>Speculum Preview</title>
     <style>
@@ -20,7 +21,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-hash/0.2.1/leaflet-hash.min.js"></script>
-
+    <script src="https://pasichnykvasyl.github.io/Leaflet.BigImage/src/Leaflet.BigImage.js"></script>
     <script type="text/javascript">
       var map = L.map('map').setView([48.853, 2.333], 13);
       var hash = new L.Hash(map);
@@ -64,7 +65,7 @@
 	  "WMS Progress": wms_progress
       };
 
-      //var hash = new L.Hash(map);
+      L.control.bigImage({position: 'topright'}).addTo(map);
       var layerControl = L.control.layers({"OSM": osm}, overlays)
 	  .addTo(map);
 

@@ -17,15 +17,23 @@
       (let [path-structure (format "%s/%s/%s.%s" x y z ext)
             fs-structure (format "%s/%s/%s/%s" output-directory-tiles
                                  vendor service path-structure)
-            target-fragment (str origin path-structure)]
+            target-fragment (str origin path-structure)
+            {:keys [status path code]}
+            (utils/download-fragment!! pool target-fragment
+                                       fs-structure)]
         ;; request & store tile
-        (if-let [mirrored-path (utils/download-fragment!! pool target-fragment
-                                                          fs-structure)]
+        (cond
+          (= :ok status)
           ;; If successfully mirrored, serve it...
           (do
-            (swap! tile-storage assoc hash mirrored-path)
-            (utils/mk-storage-image mirrored-path))
-          (utils/error-texture)))
+            (swap! tile-storage assoc hash path)
+            (utils/mk-storage-image path))
+
+          (= 404 code)
+          {:status 404
+           :body "Not Found"}
+
+          :else (utils/error-texture)))
       (utils/error-texture))))
 
 
