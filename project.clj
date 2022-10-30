@@ -5,6 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[clj-http                     "3.12.3"]
                  [integrant                    "0.8.0"]
+                 [org.clojure/core.match       "1.0.0"]
                  [org.clojure/clojure          "1.10.1"]
                  [prismatic/schema             "1.4.1"]
                  [spootnik/unilog              "0.7.24"]
