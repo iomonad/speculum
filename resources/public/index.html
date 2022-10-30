@@ -42,27 +42,9 @@
 	  tms: true
       });
 
-      var wms_poll =  L.tileLayer.wms('/wms/stea/hp/ows', {
-	  layers: "PVP3 Cion SUD",
-	  opacity: 1,
-	  maxZoom: 23,
-	  format: "image/png",
-	  transparent: true
-      });
-
-      var wms_progress =  L.tileLayer.wms('/wms/stea/hp/ows?preview%3f=true', {
-	  layers: "PVP3 Cion SUD",
-	  opacity: 1,
-	  maxZoom: 23,
-	  format: "image/png",
-	  transparent: true
-      });
-
       var overlays = {
 	  "Tile Poll": poll,
-	  "Tile Progress": progress,
-	  "WMS Poll": wms_poll,
-	  "WMS Progress": wms_progress
+	  "Tile Progress": progress
       };
 
       L.control.bigImage({position: 'topright'}).addTo(map);
