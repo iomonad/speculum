@@ -26,6 +26,7 @@
                    :source-paths ["dev"]
                    :resource-paths ["resources"]}
              :uberjar {:aot :all}}
+  :target-path "target/%s"
   :min-lein-version "2.5.3"
   :main ^{:skip-aot true} speculum.core
   :repl-options {:init-ns user
