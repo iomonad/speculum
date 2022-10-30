@@ -1,0 +1,15 @@
+version: "3.4"
+
+services:
+  speculum:
+    container_name: speculum-dev
+    build: .
+    environment:
+      SPEC: "/data/prod.edn"
+      JAVA_OPTS: "-XX:+ExitOnOutOfMemoryError -XX:+PrintGCDetails-XX:+PrintCommandLineFlags -XX:+PrintFlagsFinal -XX:ReservedCodeCacheSize=251658240 -XX:+SegmentedCodeCache -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseStringDeduplication"
+    volumes:
+      - ./specs:/data:rw
+      - ./mirror:/speculum
+    ports:
+      - 8090
+    restart: always
