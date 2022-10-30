@@ -22,7 +22,11 @@ lein uberjar
 
 ## Changelog
 
-### 0.1.1-SNAPSHOT
+### 0.1.2
+- Component default values
+- Granular configurations for `config` component
+
+### 0.1.1
 
 - WMS Mirroring Support
 - Fix: Avoid return of warn tile on 404 - design choice
