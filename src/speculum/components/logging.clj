@@ -9,6 +9,9 @@
 ;;;  Logging
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+(def config
+  {:component/logging {:app-name "speculum"}})
+
 (defonce ex-handler
   (reify Thread$UncaughtExceptionHandler
     (uncaughtException [_ t e]

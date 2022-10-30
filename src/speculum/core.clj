@@ -2,10 +2,11 @@
   (:require [integrant.core :as ig]
             [omniconf.core :as cfg]
             [speculum.components
-             [config]
-             [webserver]
-             [logging]
-             [storage]]
+             [config :as config]
+             [webserver :as webserver]
+             [logging :as logging]
+             [storage :as storage]]
+            [medley.core :refer [deep-merge]]
             [clojure.tools.logging :as log])
   (:gen-class))
 
@@ -18,12 +19,24 @@
           :type :file
           :required true}})
 
+
+(def default-system-config
+  (merge config/config
+         logging/config
+         webserver/config
+         storage/config))
+
+
+(defn load-config [path]
+  (deep-merge default-system-config
+              (ig/read-string (slurp path))))
+
+
 (defn -main [& args]
   (cfg/populate-from-cmd args)
   (cfg/populate-from-properties)
   (cfg/populate-from-env)
-  ;;(cfg/verify :silent true)
-  (let [config (ig/read-string (slurp (cfg/get :spec)))]
+  (let [config (load-config (cfg/get :spec))]
     (log/info "starting arkana server")
     (try
       (let [system (ig/init config)]

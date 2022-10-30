@@ -10,6 +10,12 @@
 ;;;  Storage
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+(def config {:component/storage
+             {:config (ig/ref :component/config)
+              :output-directory-tiles "out-tiles"
+              :output-directory-wms "out-wms"
+              :auto-create? true}})
+
 (defn rebuild-tiles-structure!
   [folder]
   (->> (file-seq (io/file folder))

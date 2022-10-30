@@ -17,6 +17,13 @@
 ;;;  Webserver
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+(def config
+  {:component/webserver
+   {:port 3000
+    :logging (ig/ref :component/logging)
+    :storage (ig/ref :component/storage)
+    :config (ig/ref :component/config)}})
+
 (defn interceptors-stack [components]
   [(itcp/speculum-context components)
    (ri.parameters/parameters-interceptor)
@@ -50,7 +57,8 @@
                        (server/dev-interceptors)
                        (server/create-server)
                        (server/start))]
-      (log/info "starting webserver component")
+      (log/infof "starting webserver component on port %s"
+                 port)
       (assoc system :server instance))))
 
 
