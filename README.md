@@ -22,7 +22,8 @@ lein uberjar
 
 ## Changelog
 
-### 0.1.3-SNAPSHOT
+### 0.1.4
+- fix: webserver listen on all interfaces
 
 ### 0.1.2
 - Component default values
