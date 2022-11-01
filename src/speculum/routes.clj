@@ -10,13 +10,15 @@
 ;;;  Routes
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+(def preview-routes
+  ["/" {:name ::root
+        :get {:handler (fn [_]
+                         (-> (r/resource-response "index.html"
+                                                  {:root "public"})
+                             (r/content-type "text/html")))}}])
+
 (defn routes [ressources]
-  [["/" {:name ::root
-         :get {:handler (fn [_]
-                          (-> (r/resource-response "index.html"
-                                                   {:root "public"})
-                              (r/content-type "text/html")))}}]
-   ["/ping" {:name ::ping
+  [["/ping" {:name ::ping
              :get {:handler (ping/ping-handler
                              {:app-name "speculum"}
                              ressources)}}]
