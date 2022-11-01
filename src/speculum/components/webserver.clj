@@ -50,8 +50,7 @@
                        (pedestal/replace-last-interceptor
                         (pedestal/routing-interceptor
                          (http/router [(if preview?
-                                         (concat (routes deps)
-                                                 preview-routes)
+                                         (vec (concat (routes deps) preview-routes))
                                          (routes deps))]
                                       (cond-> {:resources deps
                                                :data {:muuntaja muuntaja/instance

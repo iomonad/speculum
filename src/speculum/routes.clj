@@ -11,11 +11,11 @@
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (def preview-routes
-  ["/" {:name ::root
-        :get {:handler (fn [_]
-                         (-> (r/resource-response "index.html"
-                                                  {:root "public"})
-                             (r/content-type "text/html")))}}])
+  [["/" {:name ::root
+         :get {:handler (fn [_]
+                          (-> (r/resource-response "index.html"
+                                                   {:root "public"})
+                              (r/content-type "text/html")))}}]])
 
 (defn routes [ressources]
   [["/ping" {:name ::ping

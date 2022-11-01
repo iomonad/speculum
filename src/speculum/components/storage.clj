@@ -16,6 +16,9 @@
               :output-directory-wms "out-wms"
               :auto-create? true}})
 
+(defn count-files [folder]
+  (count (file-seq (io/file folder))))
+
 (defn rebuild-tiles-structure!
   [folder]
   (->> (file-seq (io/file folder))
@@ -69,10 +72,17 @@
     (assoc sys
            :tile-storage tile-storage
            :wms-storage wms-storage
-           :ping-fn (fn []
-                      {:ok true
-                       :indexed-tiles {:xyz (count @tile-storage)
-                                       :wms (count @wms-storage)}}))))
+           :ping-fn
+           (fn []
+             {:ok true
+              :xyz {:table-sum (count @tile-storage)
+                    :indexed-chunks (count-files output-directory-tiles)
+                    :lag (- (count-files output-directory-tiles)
+                            (count @tile-storage))}
+              :wms {:table-sum (count @wms-storage)
+                    :indexed-chunks (count-files output-directory-wms)
+                    :lag (- (count-files output-directory-wms)
+                            (count @wms-storage))}}))))
 
 (defmethod ig/halt-key! :component/storage
   [_ {:keys []}]

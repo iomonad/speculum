@@ -37,7 +37,7 @@
   (cfg/populate-from-properties)
   (cfg/populate-from-env)
   (let [config (load-config (cfg/get :spec))]
-    (log/info "starting arkana server")
+    (log/info "starting speculum server")
     (try
       (let [system (ig/init config)]
         (.addShutdownHook (Runtime/getRuntime)
