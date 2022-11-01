@@ -22,6 +22,9 @@ lein uberjar
 
 ## Changelog
 
+### 0.1.5
+- make preview route falcultative via component definition
+
 ### 0.1.4
 - fix: webserver listen on all interfaces
 
