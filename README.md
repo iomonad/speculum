@@ -22,6 +22,9 @@ lein uberjar
 
 ## Changelog
 
+### 0.1.6
+- Filesystem tree is checked in priority over memory
+
 ### 0.1.5
 - make preview route falcultative via component definition
 
