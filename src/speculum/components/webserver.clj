@@ -37,6 +37,7 @@
   (with-redefs [io.pedestal.http.impl.servlet-interceptor/stylobate itcp/stylobate]
     (let [default-conf {::server/type :jetty
                         ::server/port port
+                        ::server/host "0.0.0.0"
                         ::server/join? false
                         ;; no pedestal routes
                         ::server/routes []

@@ -1,15 +1,25 @@
 version: "3.4"
 
+networks:
+  web:
+    external: true
+
 services:
   speculum:
     container_name: speculum-dev
     build: .
+    networks:
+      - web
     environment:
       SPEC: "/data/prod.edn"
       JAVA_OPTS: "-XX:+ExitOnOutOfMemoryError -XX:+PrintGCDetails-XX:+PrintCommandLineFlags -XX:+PrintFlagsFinal -XX:ReservedCodeCacheSize=251658240 -XX:+SegmentedCodeCache -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseStringDeduplication"
     volumes:
       - ./specs:/data:rw
       - ./mirror:/speculum
-    ports:
-      - 8090
     restart: always
+  ping-status:
+    container_name: ping
+    networks:
+      - web
+    image: yauritux/busybox-curl:latest
+    command: sh -c 'while true; do curl -s speculum:8090/ping && sleep 1000; done'
