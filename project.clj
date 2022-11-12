@@ -1,4 +1,4 @@
-(defproject speculum "0.1.7"
+(defproject speculum "0.1.8-SNAPSHOT"
   :description "Mirror XYZ Raster Tiles locally, rebuild the server tree and estimate total mirror coverage"
   :url "https://github.com/iomonad/speculum"
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"

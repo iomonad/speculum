@@ -22,6 +22,8 @@ lein uberjar
 
 ## Changelog
 
+### 0.1.8-SNAPSHOT
+
 ### 0.1.7
 - Parametrized connection pool usage
 - Removed hash support for the moment, improve request responses performances
