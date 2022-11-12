@@ -22,6 +22,12 @@ lein uberjar
 
 ## Changelog
 
+### 0.1.7-SNAPSHOT
+- Parametrized connection pool usage
+- Removed hash support for the moment, improve request responses performances
+  significantly
+- Removed lag preview in ping routes, use total indexed tiles instead
+
 ### 0.1.6
 - Filesystem tree is checked in priority over memory
 
