@@ -1,26 +1,53 @@
 (ns speculum.components.config
   (:require [integrant.core :as ig]
-            [clj-http.conn-mgr :as cmgr]))
+            [clj-http.conn-mgr :as cmgr]
+            [clj-http.core :as hc]
+            [clojure.tools.logging :as log]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ;;;  Config
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (def config {:component/config
-             {:share-providers? false}})
+             {:share-providers? false
+              :timeout 5
+              :threads 20
+              :default-per-route 10
+              :insecure? true
+              :caching? false}})
 
 (defmethod ig/init-key :component/config
   [_ {:keys [tiles-providers wms-providers
-             share-providers?] :as sys}]
-  (let [pool (cmgr/make-reusable-conn-manager
-              {:timeout 5
-               :threads 4
-               :default-per-route 10
-               :insecure? true})]
+             share-providers? timeout threads
+             default-per-route insecure? caching?] :as sys}]
+  (let [manager
+        (cmgr/make-reusable-conn-manager
+         {:timeout timeout
+          :threads threads
+          :default-per-route default-per-route
+          :insecure? insecure?})
+        factory (hc/build-http-client
+                 {:as :stream
+                  :socket-timeout 10000
+                  :connection-timeout 10000
+                  :insecure insecure?
+                  :throw-exceptions false}
+                 caching?
+                 manager)]
+    (log/info "initializing config component")
     (assoc sys
-           :pool pool
+           :pool {:mgr manager
+                  :factory factory}
            :ping-fn (fn []
                       (cond-> {:ok true}
                         share-providers?
                         (assoc :providers {:tiles tiles-providers
                                            :wms wms-providers}))))))
+
+(defmethod ig/halt-key! :component/config
+  [_ {:keys [pool]}]
+  (log/info "shutting down config component")
+  (let [{:keys [mgr]} pool]
+    (when mgr
+      (log/info "closing connection manager")
+      (cmgr/shutdown-manager mgr))))

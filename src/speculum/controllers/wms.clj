@@ -17,11 +17,12 @@
     {:path-exists? (fs/exists? target)
      :hypothetical-path target}))
 
+
 (defn process-mirroring
-  [{:keys [config storage path-params query-params]} hash]
+  [{:keys [config storage path-params query-params]}]
   (let [{:keys [wms-providers pool]} config
         {:keys [vendor service]} path-params
-        {:keys [output-directory-wms wms-storage]} storage
+        {:keys [output-directory-wms]} storage
         {:keys [bbox layers]} query-params]
     (try
       (if-let [origin (get-in wms-providers
@@ -33,17 +34,19 @@
                                          local-path query-params)]
           (cond
             (= :ok status)
-            ;; If successfully mirrored, serve it...
-            (do
-              (swap! wms-storage assoc hash path)
-              (utils/mk-storage-image path))
+            (utils/mk-storage-image path)
 
             (= 404 code)
             {:status 404
              :body "Not Found"}
 
             :else (utils/error-texture)))
-        (utils/error-texture))
+        {:status 404
+         :body {:status :not-found
+                :message "please double-check your configuration"
+                :vendor vendor
+                :service service
+                :params query-params}})
       (catch Exception e
         (log/warn (.getMessage e))
         {:status 500
@@ -51,18 +54,14 @@
 
 
 (defn proxify-wms
-  [{:keys [query-params uri storage path-params] :as request}]
-  (let [{:keys [bbox preview?]} query-params
-        {:keys [wms-storage]} storage
-        seed (str uri ":" bbox)
-        uri-hash (utils/ressource->hashkey seed)
-        fragment-path (get @wms-storage uri-hash)
+  [{:keys [query-params storage path-params] :as request}]
+  (let [{:keys [preview?]} query-params
         {:keys [path-exists?
                 hypothetical-path]}
         (exists-in-path? storage path-params query-params)]
-    (match [path-exists? (some? preview?) (some? fragment-path)]
-           [true                _ _]  (utils/mk-storage-image hypothetical-path)
-           [_ true             true]  (utils/mk-storage-image fragment-path)
-           [_ true             false] (utils/default-texture)
-           [_ false            true]  (utils/mk-storage-image fragment-path)
-           [_ false            false] (process-mirroring request uri-hash))))
+    (match [path-exists? (some? preview?)]
+           [true         _]     (utils/mk-storage-image hypothetical-path)
+           [false        true]  (utils/default-texture)
+           [false        false] (process-mirroring request)
+           :else {:status 400
+                  :body "bad request"})))

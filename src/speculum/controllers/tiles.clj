@@ -16,10 +16,11 @@
     {:path-exists? (fs/exists? target)
      :hypothetical-path target}))
 
+
 (defn process-mirroring
-  [{:keys [config storage path-params]} hash]
+  [{:keys [config storage path-params]}]
   (let [{:keys [tiles-providers pool]} config
-        {:keys [output-directory-tiles tile-storage]} storage
+        {:keys [output-directory-tiles]} storage
         {:keys [vendor service x y z ext]} path-params]
     (try
       (if-let [origin (get-in tiles-providers
@@ -35,16 +36,19 @@
           (cond
             (= :ok status)
             ;; If successfully mirrored, serve it...
-            (do
-              (swap! tile-storage assoc hash path)
-              (utils/mk-storage-image path))
+            (utils/mk-storage-image path)
 
             (= 404 code)
             {:status 404
              :body "Not Found"}
 
             :else (utils/error-texture)))
-        (utils/error-texture))
+        {:status 404
+         :body {:message "please double-check your configuration"
+                :status :not-found
+                :vendor vendor
+                :service service
+                :params path-params}})
       (catch Exception e
         (log/error (.getMessage e))
         {:status 500
@@ -59,20 +63,14 @@
           tiles if present in the filesystem, otherwise
           return the default tile
   "
-  [{:keys [query-params uri storage path-params] :as request}]
+  [{:keys [query-params storage path-params] :as request}]
   (let [{:keys [preview?]} query-params
-        {:keys [tile-storage]} storage
-        uri-hash (utils/ressource->hashkey uri)
-        fragment-path (get @tile-storage uri-hash)
         {:keys [path-exists?
                 hypothetical-path]}
         (exists-in-path? storage path-params)]
-    (match [path-exists? (some? preview?) (some? fragment-path)]
-           [true               _ _]   (utils/mk-storage-image hypothetical-path)
-           ;; Serve the current in preview mode
-           [_ true             true]  (utils/mk-storage-image fragment-path)
-           [_ true             false] (utils/default-texture)
-           ;; Serve the current in mirrored mode
-           [_ false            true]  (utils/mk-storage-image fragment-path)
-           ;; Mirror the inexistent fragment
-           [_ false            false] (process-mirroring request uri-hash))))
+    (match [path-exists? (some? preview?)]
+           [true         _]     (utils/mk-storage-image hypothetical-path)
+           [false        true]  (utils/default-texture)
+           [false        false] (process-mirroring request)
+           :else {:status 400
+                  :body "bad request"})))
