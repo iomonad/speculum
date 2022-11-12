@@ -9,9 +9,9 @@
               "io.pedestal"    :warn
               "org.eclipse"    :warn
               "org.apache"     :warn
-              "speculum"       :info}}
+              "speculum"       :debug}}
  ;; =================================
- :component/webserver {}
+ :component/webserver {:preview? true}
  ;; =================================
  :component/storage {:output-directory-tiles "mirror-tiles"
                      :output-directory-wms "mirror-wms"

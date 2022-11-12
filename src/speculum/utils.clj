@@ -19,13 +19,20 @@
 (defn download-fragment!!
   ([pool target path]
    (download-fragment!! pool target path {}))
-  ([{:keys [mgr factory]} target path query-params]
+  ([{:keys [mgr factory] :as pool} target path query-params]
    ;; Ensure path exists
    (try
      (let [{:keys [status body]}
            (http/get target
-                     (cond-> {:connection-manager mgr
-                              :http-client factory}
+                     (cond-> {:as :stream
+                              :throw-exceptions false
+                              :socket-timeout 3000
+                              :connection-timeout 3000
+                              :insecure true}
+                       pool
+                       (assoc :http-client factory
+                              :connection-manager mgr)
+                       ;; %
                        ((complement empty?) query-params)
                        (assoc :query-params query-params)))
            parent-structure (.toString (fs/parent path))]

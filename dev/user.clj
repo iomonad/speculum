@@ -1,11 +1,7 @@
 (ns user
     (:require [clojure.tools.namespace.repl :refer [refresh]]
               [integrant.repl :as ir]
-              [integrant.core :as ig]
-              [speculum.components.config]
-              [speculum.components.storage]
-              [speculum.components.webserver]
-              [speculum.components.logging]))
+              [integrant.core :as ig]))
 
 (defn repl-spec []
   (ig/read-string (slurp "specs/prod.edn")))

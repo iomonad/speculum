@@ -19,7 +19,7 @@
 
 (defn process-mirroring
   [{:keys [config storage path-params]}]
-  (let [{:keys [tiles-providers pool]} config
+  (let [{:keys [tiles-providers use-pool? pool]} config
         {:keys [output-directory-tiles]} storage
         {:keys [vendor service x y z ext]} path-params]
     (try
@@ -29,6 +29,7 @@
               fs-structure (format "%s/%s/%s/%s" output-directory-tiles
                                    vendor service path-structure)
               target-fragment (str origin path-structure)
+              pool (when use-pool? pool)
               {:keys [status path code]}
               (utils/download-fragment!! pool target-fragment
                                          fs-structure)]

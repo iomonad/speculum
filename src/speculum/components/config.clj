@@ -10,6 +10,7 @@
 
 (def config {:component/config
              {:share-providers? false
+              :use-pool? false
               :timeout 5
               :threads 20
               :default-per-route 10
@@ -27,11 +28,9 @@
           :default-per-route default-per-route
           :insecure? insecure?})
         factory (hc/build-http-client
-                 {:as :stream
-                  :socket-timeout 10000
+                 {:socket-timeout 10000
                   :connection-timeout 10000
-                  :insecure insecure?
-                  :throw-exceptions false}
+                  :insecure insecure?}
                  caching?
                  manager)]
     (log/info "initializing config component")

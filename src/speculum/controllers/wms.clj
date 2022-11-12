@@ -20,7 +20,7 @@
 
 (defn process-mirroring
   [{:keys [config storage path-params query-params]}]
-  (let [{:keys [wms-providers pool]} config
+  (let [{:keys [wms-providers use-pool? pool]} config
         {:keys [vendor service]} path-params
         {:keys [output-directory-wms]} storage
         {:keys [bbox layers]} query-params]
@@ -29,6 +29,7 @@
                               [(keyword vendor) (keyword service) :url])]
         (let [local-path (format "%s/%s/%s/%s/%s.png"
                                  output-directory-wms vendor service layers bbox)
+              pool (when use-pool? pool)
               {:keys [status path code]}
               (utils/download-fragment!! pool origin
                                          local-path query-params)]
