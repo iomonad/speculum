@@ -3,7 +3,6 @@
             [speculum.controllers.tiles :as tiles]
             [ring.util.response :as r]
             [schema.core :as s]
-            [speculum.interceptors :as itcp]
             [speculum.controllers.wms :as wms]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -16,6 +16,7 @@
                  [metosin/reitit-pedestal      "0.5.18"]
                  [org.clojure/tools.logging    "1.2.4"]
                  [buddy/buddy-core             "1.10.413"]
+                 [buddy/buddy-auth             "2.1.0" :exclusions [cheshire]]
                  [cc.qbits/knit                "1.0.0"]
                  [clj-commons/fs               "1.6.310"]
                  [clj-http                     "3.12.3"]

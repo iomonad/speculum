@@ -25,13 +25,19 @@
     :storage (ig/ref :component/storage)
     :config (ig/ref :component/config)}})
 
-(defn interceptors-stack [components]
-  [(itcp/speculum-context components)
-   (ri.parameters/parameters-interceptor)
-   (ri.muuntaja/format-negotiate-interceptor)
-   (ri.muuntaja/format-response-interceptor)
-   (exception/exception-interceptor)
-   (ri.muuntaja/format-request-interceptor)])
+(defn interceptors-stack
+  [{:keys [config] :as components}]
+  (let [{:keys [realm? realm]} config]
+    (cond-> [(itcp/speculum-context components)
+             (ri.parameters/parameters-interceptor)
+             (ri.muuntaja/format-negotiate-interceptor)
+             (ri.muuntaja/format-response-interceptor)
+             (exception/exception-interceptor)
+             (ri.muuntaja/format-request-interceptor)]
+      ;; Add auth interceptors if enabled in spec
+      realm? (concat [(itcp/authentication-interceptor realm)
+                      (itcp/authorization-interceptor  realm)
+                      itcp/check-permissions]))))
 
 (defmethod ig/init-key :component/webserver
   [_ {:keys [port preview?] :as system}]
@@ -61,8 +67,7 @@
                        (server/dev-interceptors)
                        (server/create-server)
                        (server/start))]
-      (log/infof "starting webserver component on port %s"
-                 port)
+      (log/infof "starting webserver component on port %s" port)
       (assoc system :server instance))))
 
 

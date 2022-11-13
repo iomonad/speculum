@@ -2,7 +2,11 @@
   (:require [clojure.tools.logging :as log]
             [io.pedestal.log :as plog]
             [reitit.interceptor :as interceptor]
-            [io.pedestal.http.impl.servlet-interceptor])
+            [io.pedestal.http.impl.servlet-interceptor]
+            [buddy.auth :as a]
+            [buddy.auth.middleware :as bm]
+            [io.pedestal.interceptor.chain :as interceptor.chain]
+            [io.pedestal.interceptor.error :refer [error-dispatch]])
   (:import (io.pedestal.interceptor Interceptor)))
 
 (extend-protocol interceptor/IntoInterceptor
@@ -36,3 +40,42 @@
     :enter @#'io.pedestal.http.impl.servlet-interceptor/enter-stylobate
     :leave @#'io.pedestal.http.impl.servlet-interceptor/leave-stylobate
     :error error-stylobate}))
+
+;; Auth interceptor
+
+(defn authentication-interceptor
+  "Port of buddy-auth's wrap-authentication middleware."
+  [backend]
+  (io.pedestal.interceptor/interceptor
+   {:name ::authenticate
+    :enter (fn [ctx]
+             (update ctx :request bm/authentication-request
+                     backend))}))
+
+
+(defn authorization-interceptor
+  "Port of buddy-auth's wrap-authorization middleware."
+  [backend]
+  (error-dispatch
+   [ctx ex]
+   [{:exception-type :clojure.lang.ExceptionInfo :stage :enter}]
+   (try
+     (assoc ctx :response
+            (bm/authorization-error (:request ctx)
+                                    ex backend))
+     (catch Exception e
+       (assoc ctx ::interceptor.chain/error e)))
+   :else (assoc ctx ::interceptor.chain/error ex)))
+
+
+(def check-permissions
+  "Check permission from current request"
+  {:name ::check-permissions
+   :enter
+   (fn [{:keys [request] :as ctx}]
+     (if (a/authenticated? request) ctx
+       (-> ctx
+           interceptor.chain/terminate
+           (assoc :response {:status 401
+                             :body {:status 401
+                                    :message "Unauthorized"}}))))})
