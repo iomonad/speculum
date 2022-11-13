@@ -10,7 +10,8 @@
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (def config {:component/config
-             {:share-providers? false
+             {:logging (ig/ref :component/logging)
+              :share-providers? false
               :use-pool? false
               :timeout 5
               :threads 20
