@@ -1,4 +1,4 @@
-<a href="https://github.com/iomonad/gtekportail"><img
+<a href="https://github.com/iomonad/speculum"><img
   src=".github/mirror.png" 
   height="350" align="right"></a>
   
@@ -18,11 +18,40 @@ acting like a local proxy.
 
 ```bash
 lein uberjar
+docker build -t speculum .
+```
+
+## Authentification
+
+To enable authentification, specify the key in the `:component/config` component as follow
+on your component definition:
+
+```clojure
+ :component/config
+ {:realm? true
+  :realm-username "root"
+  :realm-password "toor"
+  ...}
+```
+
+Then hash the couple as follow and use it as authentification header:
+
+```clojure
+(def mk-base64
+  (comp codecs/bytes->str
+        base64/encode))
+
+(comment
+  (let [header (str "Basic "(mk-base64 "root:toor"))]
+    (->> (h/get "http://localhost:8090/ping"
+                {:headers {:authorization header}})
+         :body)))
 ```
 
 ## Changelog
 
 ### 0.1.8-SNAPSHOT
+- Basic authentification support
 
 ### 0.1.7
 - Parametrized connection pool usage
