@@ -2,9 +2,7 @@
   (:require [integrant.core :as ig]
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
-            [me.raynes.fs :as fs]
-            [clojure.string :as str]
-            [speculum.utils :as utils]))
+            [clojure.java.shell :refer [sh]]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ;;;  Storage
@@ -16,8 +14,10 @@
               :output-directory-wms "out-wms"
               :auto-create? true}})
 
-(defn count-files [folder]
-  (count (file-seq (io/file folder))))
+(defn count-files! [folder]
+  (let [{:keys [out]}
+        (sh "find" folder "-type" "f")]
+    (some->> out count)))
 
 (defmethod ig/init-key :component/storage
   [_ {:keys [output-directory-tiles
@@ -32,8 +32,8 @@
          :ping-fn
          (fn []
            {:ok true
-            :indexed-chunks {:xyz (count-files output-directory-tiles)
-                             :wms (count-files output-directory-wms)}})))
+            :indexed-chunks {:xyz (count-files! output-directory-tiles)
+                             :wms (count-files! output-directory-wms)}})))
 
 (defmethod ig/halt-key! :component/storage
   [_ {:keys []}]

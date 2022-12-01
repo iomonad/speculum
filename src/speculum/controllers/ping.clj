@@ -29,4 +29,3 @@
                  :hostname   (.getHostName (java.net.InetAddress/getLocalHost))
                  :resources  (keys resources)
                  :components pings})}))))
-
