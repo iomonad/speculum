@@ -8,7 +8,6 @@
                  [cc.qbits/knit                "1.0.0"]
                  [clj-commons/fs               "1.6.310"]
                  [clj-http                     "3.12.3"]
-                 [clj-http                     "3.12.3"]
                  [com.grammarly/omniconf       "0.4.3"]
                  [integrant                    "0.8.0"]
                  [io.pedestal/pedestal.jetty   "0.5.5"]
