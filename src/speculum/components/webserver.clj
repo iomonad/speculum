@@ -23,7 +23,8 @@
    {:port 3000
     :logging (ig/ref :component/logging)
     :storage (ig/ref :component/storage)
-    :config (ig/ref :component/config)}})
+    :config (ig/ref :component/config)
+    :workqueue (ig/ref :component/workqueue)}})
 
 (defn interceptors-stack
   [{:keys [config] :as components}]

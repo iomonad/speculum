@@ -2,6 +2,7 @@
   (:require [integrant.core :as ig]
             [omniconf.core :as cfg]
             [speculum.components
+             [workqueue :as workqueue]
              [config :as config]
              [webserver :as webserver]
              [logging :as logging]
@@ -24,7 +25,8 @@
   (merge config/config
          logging/config
          webserver/config
-         storage/config))
+         storage/config
+         workqueue/config))
 
 
 (defn load-config [path]
