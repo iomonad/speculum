@@ -1,11 +1,16 @@
 (ns speculum.components.workqueue
   (:require [integrant.core :as ig]
-            [clojure.core.async :as a]
+            [clojure.core.async
+             :as a
+             :refer [>! <! >!! <!! go chan buffer close! thread
+                     alts! alts!! take! put! timeout]]
             [clojure.tools.logging :as log]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ;;;  Workqueue
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+(def config {:component/workqueue {}})
 
 (defmethod ig/init-key :component/workqueue
   [_ {:keys [] :as sys}]

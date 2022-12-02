@@ -1,6 +1,9 @@
 (ns speculum.generators
   (:require [clojure.core.matrix :as m]
-            [clojure.core.async :as a]))
+            [clojure.core.async
+             :as a
+             :refer [>! <! >!! <!! go chan buffer close! thread
+                     alts! alts!! take! put! timeout]]))
 
 
 (defn- generate-level
