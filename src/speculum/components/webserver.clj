@@ -24,7 +24,8 @@
     :logging (ig/ref :component/logging)
     :storage (ig/ref :component/storage)
     :config (ig/ref :component/config)
-    :workqueue (ig/ref :component/workqueue)}})
+    :workqueue (ig/ref :component/workqueue)
+    :metrics (ig/ref :component/metrics)}})
 
 (defn interceptors-stack
   [{:keys [config] :as components}]

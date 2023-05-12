@@ -6,7 +6,8 @@
              [config :as config]
              [webserver :as webserver]
              [logging :as logging]
-             [storage :as storage]]
+             [storage :as storage]
+             [metrics :as metrics]]
             [medley.core :refer [deep-merge]]
             [clojure.tools.logging :as log])
   (:gen-class))
@@ -26,7 +27,8 @@
          logging/config
          webserver/config
          storage/config
-         workqueue/config))
+         workqueue/config
+         metrics/config))
 
 
 (defn load-config [path]

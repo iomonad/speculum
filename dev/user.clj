@@ -26,4 +26,5 @@
   (let [header (str "Basic "(mk-base64 "root:toor"))]
     (->> (h/get "http://localhost:8090/ping"
                 {:headers {:authorization header}})
-         :body)))
+         :body))
+  )
