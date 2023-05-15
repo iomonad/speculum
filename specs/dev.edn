@@ -11,7 +11,12 @@
               "org.apache"     :warn
               "speculum"       :debug}}
  ;; =================================
- :component/webserver {:preview? true}
+ :component/webserver {:preview? false
+                       :port 3000}
+ ;; =================================
+ :component/metrics {:globals? true
+                     :binders {:hotspot? true
+                               :logging? true}}
  ;; =================================
  :component/storage {:output-directory-tiles "mirror-tiles"
                      :output-directory-wms "mirror-wms"

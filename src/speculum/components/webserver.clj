@@ -13,6 +13,10 @@
              [parameters :as ri.parameters]
              [muuntaja   :as ri.muuntaja]]
             [speculum.interceptors :as itcp]
+               [macrometer
+                [timers :as t]
+                [gauges :as g]
+                [binders :refer [monitor-jetty]]]
             [macrometer.prometheus :as prom]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -20,40 +24,39 @@
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (def config
-  {:component/webserver
-   {:port 3000
-    :logging (ig/ref :component/logging)
-    :storage (ig/ref :component/storage)
-    :config (ig/ref :component/config)
-    :workqueue (ig/ref :component/workqueue)
-    :metrics (ig/ref :component/metrics)}})
+  {:component/webserver {:port 3000
+                         :logging (ig/ref :component/logging)
+                         :storage (ig/ref :component/storage)
+                         :config (ig/ref :component/config)
+                         :workqueue (ig/ref :component/workqueue)
+                         :metrics (ig/ref :component/metrics)}})
 
 (defn interceptors-stack
-  [{:keys [config] :as components}]
+  [{:keys [config metrics] :as components}]
   (let [{:keys [realm? realm]} config]
     (cond-> [(itcp/speculum-context components)
              (ri.parameters/parameters-interceptor)
              (ri.muuntaja/format-negotiate-interceptor)
              (ri.muuntaja/format-response-interceptor)
              (exception/exception-interceptor)
-             (ri.muuntaja/format-request-interceptor)]
+             (ri.muuntaja/format-request-interceptor)
+             (itcp/compiled-add-metrics metrics)]
       ;; Add auth interceptors if enabled in spec
       realm? (concat [(itcp/authentication-interceptor realm)
                       (itcp/authorization-interceptor  realm)
                       itcp/check-permissions]))))
 
 (defmethod ig/init-key :component/webserver
-  [_ {:keys [port preview? metrics] :as system}]
+  [_ {:keys [port preview? metrics extra-routes] :as system}]
   (with-redefs [io.pedestal.http.impl.servlet-interceptor/stylobate itcp/stylobate]
     (let [default-conf {::server/type :jetty
                         ::server/port port
                         ::server/host "0.0.0.0"
                         ::server/join? false
-                        ;; no pedestal routes
                         ::server/routes []
                         ::server/secure-headers {:content-security-policy-settings
                                                  {:object-src "none"}}}
-          deps (select-keys system [:config :storage])
+          deps (select-keys system [:config :storage :metrics])
           instance (-> default-conf
                        (server/default-interceptors)
                        (pedestal/replace-last-interceptor
@@ -70,6 +73,8 @@
                        (server/dev-interceptors)
                        (server/create-server)
                        (server/start))]
+      (when metrics
+        (monitor-jetty (:io.pedestal.http/server instance) metrics))
       (log/infof "starting webserver component on port %s" port)
       (assoc system :server instance))))
 

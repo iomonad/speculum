@@ -75,3 +75,12 @@
 
 (defn default-texture [] (mk-image "empty.png"))
 (defn error-texture [] (mk-image "error.png"))
+
+;;; Http helpers
+
+(defn success?
+  [ctx success-pred]
+  (let [status (str (get-in ctx [:response :status]))]
+    (boolean (or (and success-pred (success-pred ctx))
+                 (.startsWith status "2")
+                 (.startsWith status "3")))))
