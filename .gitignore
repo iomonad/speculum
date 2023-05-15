@@ -14,3 +14,4 @@ pom.xml.asc
 specs/prod.edn
 /mirror*
 *.xml
+nvd-clojure.edn
