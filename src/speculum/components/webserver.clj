@@ -12,7 +12,8 @@
              [exception :as exception]
              [parameters :as ri.parameters]
              [muuntaja   :as ri.muuntaja]]
-            [speculum.interceptors :as itcp]))
+            [speculum.interceptors :as itcp]
+            [macrometer.prometheus :as prom]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ;;;  Webserver
@@ -42,7 +43,7 @@
                       itcp/check-permissions]))))
 
 (defmethod ig/init-key :component/webserver
-  [_ {:keys [port preview?] :as system}]
+  [_ {:keys [port preview? metrics] :as system}]
   (with-redefs [io.pedestal.http.impl.servlet-interceptor/stylobate itcp/stylobate]
     (let [default-conf {::server/type :jetty
                         ::server/port port

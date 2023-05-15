@@ -6,8 +6,7 @@
             [buddy.auth :as a]
             [buddy.auth.middleware :as bm]
             [io.pedestal.interceptor.chain :as interceptor.chain]
-            [io.pedestal.interceptor.error :refer [error-dispatch]]
-            [speculum.components.metrics :as metrics])
+            [io.pedestal.interceptor.error :refer [error-dispatch]])
   (:import (io.pedestal.interceptor Interceptor)))
 
 (extend-protocol interceptor/IntoInterceptor

@@ -6,10 +6,10 @@
              [config :as config]
              [webserver :as webserver]
              [logging :as logging]
-             [storage :as storage]
-             [metrics :as metrics]]
+             [storage :as storage]]
             [medley.core :refer [deep-merge]]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [macrometer.prometheus :as prom])
   (:gen-class))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -28,7 +28,8 @@
          webserver/config
          storage/config
          workqueue/config
-         metrics/config))
+         ;;metrics/config
+         prom/config))
 
 
 (defn load-config [path]
