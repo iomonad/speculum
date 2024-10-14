@@ -2,8 +2,7 @@
   (:require [integrant.core :as ig]
             [clj-http.conn-mgr :as cmgr]
             [clj-http.core :as hc]
-            [clojure.tools.logging :as log]
-            [buddy.auth.backends :as ab]))
+            [clojure.tools.logging :as log]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ;;;  Config
@@ -17,16 +16,12 @@
               :threads 20
               :default-per-route 10
               :insecure? true
-              :caching? false
-              :realm? false
-              :realm-name "Speculum"}})
+              :caching? false}})
 
 (defmethod ig/init-key :component/config
   [_ {:keys [tiles-providers wms-providers
              share-providers? timeout threads
-             default-per-route insecure? caching?
-             realm? realm-username realm-password
-             realm-name] :as sys}]
+             default-per-route insecure? caching?] :as sys}]
   (let [manager
         (cmgr/make-reusable-conn-manager
          {:timeout timeout
@@ -38,16 +33,7 @@
                   :connection-timeout 10000
                   :insecure insecure?}
                  caching?
-                 manager)
-        realm-enabled? (or realm? (and realm-username
-                                       realm-password))
-        realm (if realm-enabled?
-                (ab/basic {:realm realm-name
-                           :authfn (fn [_request {:keys [username password]}]
-                                     (when (and (= username realm-username)
-                                                (= password  realm-password))
-                                       :ok))})
-                (log/warn "authentification realm is disabled!"))]
+                 manager)]
     (log/info "initializing config component")
     (cond-> (assoc sys
                    :pool {:mgr manager
@@ -56,8 +42,7 @@
                               (cond-> {:ok true}
                                 share-providers?
                                 (assoc :providers {:tiles tiles-providers
-                                                   :wms wms-providers}))))
-      realm-enabled? (assoc :realm realm))))
+                                                   :wms wms-providers})))))))
 
 (defmethod ig/halt-key! :component/config
   [_ {:keys [pool]}]

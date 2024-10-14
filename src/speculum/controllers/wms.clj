@@ -17,7 +17,6 @@
     {:path-exists? (fs/exists? target)
      :hypothetical-path target}))
 
-
 (defn process-mirroring
   [{:keys [config storage path-params query-params]}]
   (let [{:keys [wms-providers use-pool? pool]} config
@@ -53,7 +52,6 @@
         {:status 500
          :body (.getMessage e)}))))
 
-
 (defn proxify-wms
   [{:keys [query-params storage path-params] :as request}]
   (let [{:keys [preview?]} query-params
@@ -61,8 +59,8 @@
                 hypothetical-path]}
         (exists-in-path? storage path-params query-params)]
     (match [path-exists? (some? preview?)]
-           [true         _]     (utils/mk-storage-image hypothetical-path)
-           [false        true]  (utils/default-texture)
-           [false        false] (process-mirroring request)
-           :else {:status 400
-                  :body "bad request"})))
+      [true         _]     (utils/mk-storage-image hypothetical-path)
+      [false        true]  (utils/default-texture)
+      [false        false] (process-mirroring request)
+      :else {:status 400
+             :body "bad request"})))

@@ -5,7 +5,6 @@
              :refer [>! <! >!! <!! go chan buffer close! thread
                      alts! alts!! take! put! timeout]]))
 
-
 (defn- generate-level
   "Generate a flat worklist of selected
    range"
@@ -21,5 +20,4 @@
 
 (comment
   (level->chan 1 [2 2] [7 7])
-  (count (shuffle (generate-level 1 [2 2] [200 200])))
-  )
+  (count (shuffle (generate-level 1 [2 2] [200 200]))))

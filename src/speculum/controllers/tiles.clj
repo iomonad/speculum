@@ -16,7 +16,6 @@
     {:path-exists? (fs/exists? target)
      :hypothetical-path target}))
 
-
 (defn process-mirroring
   [{:keys [config storage path-params]}]
   (let [{:keys [tiles-providers use-pool? pool]} config
@@ -55,7 +54,6 @@
         {:status 500
          :body (.getMessage e)}))))
 
-
 (defn proxify-tiles
   "Proxify & cache the Raster Tile Requests
 
@@ -70,8 +68,8 @@
                 hypothetical-path]}
         (exists-in-path? storage path-params)]
     (match [path-exists? (some? preview?)]
-           [true         _]     (utils/mk-storage-image hypothetical-path)
-           [false        true]  (utils/default-texture)
-           [false        false] (process-mirroring request)
-           :else {:status 400
-                  :body "bad request"})))
+      [true         _]     (utils/mk-storage-image hypothetical-path)
+      [false        true]  (utils/default-texture)
+      [false        false] (process-mirroring request)
+      :else {:status 400
+             :body "bad request"})))

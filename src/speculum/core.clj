@@ -21,7 +21,6 @@
           :type :file
           :required true}})
 
-
 (def default-system-config
   (merge config/config
          logging/config
@@ -31,11 +30,9 @@
          ;;metrics/config
          prom/config))
 
-
 (defn load-config [path]
   (deep-merge default-system-config
               (ig/read-string (slurp path))))
-
 
 (defn -main [& args]
   (cfg/populate-from-cmd args)

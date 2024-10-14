@@ -17,7 +17,6 @@
                                           {:root "public"})
                      (r/content-type "text/html")))}}]])
 
-
 (defn routes [{:keys [metrics] :as ressources}]
   (let [{metrics-routes :reitit.http/routes} metrics]
     [["/ping" {:name ::ping

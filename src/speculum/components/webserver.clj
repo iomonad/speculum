@@ -13,10 +13,10 @@
              [parameters :as ri.parameters]
              [muuntaja   :as ri.muuntaja]]
             [speculum.interceptors :as itcp]
-               [macrometer
-                [timers :as t]
-                [gauges :as g]
-                [binders :refer [monitor-jetty]]]
+            [macrometer
+             [timers :as t]
+             [gauges :as g]
+             [binders :refer [monitor-jetty]]]
             [macrometer.prometheus :as prom]))
 
 ;;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,51 +33,42 @@
 
 (defn interceptors-stack
   [{:keys [config metrics] :as components}]
-  (let [{:keys [realm? realm]} config]
-    (cond-> [(itcp/speculum-context components)
-             (ri.parameters/parameters-interceptor)
-             (ri.muuntaja/format-negotiate-interceptor)
-             (ri.muuntaja/format-response-interceptor)
-             (exception/exception-interceptor)
-             (ri.muuntaja/format-request-interceptor)
-             (itcp/compiled-add-metrics metrics)]
-      ;; Add auth interceptors if enabled in spec
-      realm? (concat [(itcp/authentication-interceptor realm)
-                      (itcp/authorization-interceptor  realm)
-                      itcp/check-permissions]))))
+  (cond-> [(itcp/speculum-context components)
+           (ri.parameters/parameters-interceptor)
+           (ri.muuntaja/format-negotiate-interceptor)
+           (ri.muuntaja/format-response-interceptor)
+           (exception/exception-interceptor)
+           (ri.muuntaja/format-request-interceptor)
+           (itcp/compiled-add-metrics metrics)]))
 
 (defmethod ig/init-key :component/webserver
-  [_ {:keys [port preview? metrics extra-routes] :as system}]
-  (with-redefs [io.pedestal.http.impl.servlet-interceptor/stylobate itcp/stylobate]
-    (let [default-conf {::server/type :jetty
-                        ::server/port port
-                        ::server/host "0.0.0.0"
-                        ::server/join? false
-                        ::server/routes []
-                        ::server/secure-headers {:content-security-policy-settings
-                                                 {:object-src "none"}}}
-          deps (select-keys system [:config :storage :metrics])
-          instance (-> default-conf
-                       (server/default-interceptors)
-                       (pedestal/replace-last-interceptor
-                        (pedestal/routing-interceptor
-                         (http/router [(if preview?
-                                         (vec (concat (routes deps) preview-routes))
-                                         (routes deps))]
-                                      (cond-> {:resources deps
-                                               :data {:muuntaja muuntaja/instance
-                                                      :coercion reitit.coercion.schema/coercion
-                                                      ;; Keep stock itcp for the moment
-                                                      :interceptors (interceptors-stack
-                                                                     deps)}}))))
-                       (server/dev-interceptors)
-                       (server/create-server)
-                       (server/start))]
-      (when metrics
-        (monitor-jetty (:io.pedestal.http/server instance) metrics))
-      (log/infof "starting webserver component on port %s" port)
-      (assoc system :server instance))))
-
+  [_ {:keys [port preview? metrics] :as system}]
+  (let [default-conf {::server/type :jetty
+                      ::server/port port
+                      ::server/host "0.0.0.0"
+                      ::server/join? false
+                      ::server/routes []
+                      ::server/secure-headers {:content-security-policy-settings
+                                               {:object-src "none"}}}
+        deps (select-keys system [:config :storage :metrics])
+        instance (-> default-conf
+                     (server/default-interceptors)
+                     (pedestal/replace-last-interceptor
+                      (pedestal/routing-interceptor
+                       (http/router [(if preview?
+                                       (vec (concat (routes deps) preview-routes))
+                                       (routes deps))]
+                                    (cond-> {:resources deps
+                                             :data {:muuntaja muuntaja/instance
+                                                    :coercion reitit.coercion.schema/coercion
+                                                    :interceptors (interceptors-stack deps)}}))))
+                     (server/dev-interceptors)
+                     (server/create-server)
+                     (server/start))]
+    (when metrics
+      (monitor-jetty (:io.pedestal.http/server instance) metrics))
+    (log/infof "starting webserver component on port %s" port)
+    (assoc system :server instance)))
 
 (defmethod ig/halt-key! :component/webserver
   [_ {:keys [server]}]
